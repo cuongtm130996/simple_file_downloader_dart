@@ -1,4 +1,4 @@
-name: simple_file_downloader_dart
+name: simple_file_downloader_dart2
 description: a simple file downloader by dio, support resume  from breakpoint
 version: 1.0.0
 repository: https://github.com/hss01248/simple_file_downloader_flutter
