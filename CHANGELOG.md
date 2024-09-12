@@ -13,3 +13,6 @@
 ## 1.0.4
 - fix file.delete time
 
+## 1.0.5
+- downgrade the dart version
+
