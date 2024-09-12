@@ -14,7 +14,9 @@ class FileAndDirUtil {
     String saveDir = await dealSaveDir(config);
     config.saveDir = saveDir;
 
-    String name = dealFileName(config.url);
+
+    String name = dealFileName(config);
+    config.fileName = name;
 
     File file = File('$saveDir/$name');
 
@@ -76,7 +78,11 @@ class FileAndDirUtil {
     return dir.path;
   }
 
-  static String dealFileName(String url) {
+  static String dealFileName(FileDownloader config) {
+    if(config.fileName !=null && config.fileName !=null){
+      return config.fileName!;
+    }
+    String url = config.url;
     try {
       url = Uri.decodeFull(url);
     } catch (e) {

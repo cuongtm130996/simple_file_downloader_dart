@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:dio_http_formatter/dio_http_formatter.dart';
+//import 'package:dio_http_formatter/dio_http_formatter.dart';
 
 import 'file_dir_util.dart';
 
@@ -24,7 +24,7 @@ class FileDownloader {
   static Dio initDio() {
     Dio dio = Dio();
     if(_openLog){
-      dio.interceptors.add(HttpFormatter());
+      //dio.interceptors.add(HttpFormatter());
     }
     return dio;
   }
@@ -41,6 +41,7 @@ class FileDownloader {
   String url;
   String? filePath;
   String? saveDir;
+  String? fileName;
   bool? forceRedownload;
   bool? notAcceptRanges;
   Map<String, dynamic> headers;
@@ -60,6 +61,7 @@ class FileDownloader {
   FileDownloader({
     required this.url,
     this.filePath,
+    this.fileName,
     this.forceRedownload,
     this.notAcceptRanges,
     this.headers = const {},
@@ -89,7 +91,7 @@ class FileDownloader {
     config.onStartReal?.call(url, filePath ?? "");
 
     if (_runningTask.contains(url)) {
-      print('该url已经在下载中 $url');
+      printLog('该url已经在下载中 $url');
       config.onFailed?.call(url, filePath ?? "", '', '该url已经在下载中', null);
       return;
     }
@@ -98,7 +100,7 @@ class FileDownloader {
       filePath = await FileAndDirUtil.dealFilePath(config);
       config.filePath = filePath;
     } catch (e) {
-      print('下载失败0 $url \n $e');
+      printLog('下载失败0 $url \n $e');
       config.onFailed?.call(url, filePath ?? "", '', e.toString(), null);
       return;
     }
@@ -130,7 +132,7 @@ class FileDownloader {
 
         if (fileSizeAlreadyKnown != null && fileSizeAlreadyKnown > 0) {
           if (file.lengthSync() == fileSizeAlreadyKnown) {
-            print('文件已存在并且大小与服务器匹配 $filePath');
+            printLog('文件已存在并且大小与服务器匹配 $filePath');
             _runningTask.remove(url);
             config.onSuccess(url, filePath);
             return;
@@ -150,7 +152,7 @@ class FileDownloader {
       cancelToken: cancelToken);
 
       if (response.statusCode != 200 && response.statusCode != 206) {
-        print('下载失败: ${response.statusCode}, $url');
+        printLog('下载失败: ${response.statusCode}, $url');
         _runningTask.remove(url);
         _tokenMap.remove(url);
         config.onFailed?.call(url, filePath, response.statusCode.toString(),
@@ -189,10 +191,10 @@ class FileDownloader {
                   totalBytesReceived, speed);
               int? size = fileSizeAlreadyKnown;
               if(fileSizeAlreadyKnown == null || fileSizeAlreadyKnown ==0){
-                print("download-progress: unknown%, $url"
+                printLog("download-progress: unknown%, $url"
                     "\n${(totalBytesReceived/1024).toStringAsFixed(0)}KB, speed: ${(speed/1024).toStringAsFixed(0)}KB/s");
               }else{
-                print("download-progress: ${(totalBytesReceived*100.0/(fileSizeAlreadyKnown)).toStringAsFixed(1)}%, $url"
+                printLog("download-progress: ${(totalBytesReceived*100.0/(fileSizeAlreadyKnown)).toStringAsFixed(1)}%, $url"
                     "\n${(totalBytesReceived/1024).toStringAsFixed(0)}KB, speed: ${(speed/1024).toStringAsFixed(0)}KB/s");
               }
 
@@ -210,7 +212,7 @@ class FileDownloader {
           _tokenMap.remove(url);
           if (fileSizeAlreadyKnown != null && fileSizeAlreadyKnown>0 &&
               file.lengthSync() != fileSizeAlreadyKnown) {
-            print('下载失败: 文件大小不匹配 $url  ${file.lengthSync()}, $fileSizeAlreadyKnown');
+            printLog('下载失败: 文件大小不匹配 $url  ${file.lengthSync()}, $fileSizeAlreadyKnown');
 
             config.onFailed?.call(
               url,
@@ -222,7 +224,7 @@ class FileDownloader {
             file.deleteSync();
           } else {
             config.onSuccess(url, filePath!);
-            print('下载成功 $url  -> $filePath');
+            printLog('下载成功 $url  -> $filePath');
           }
         },
         onError: (e,s) {
@@ -231,7 +233,7 @@ class FileDownloader {
           if(text.startsWith("HttpException: Connection closed while receiving data")){
             if(!_tokenMap.containsKey(url)){
               //为取消的请求:
-              print('请求被手动取消: $url \n-> $e ->\n$s');
+              printLog('请求被手动取消: $url \n-> $e ->\n$s');
               config.onCancel?.call(url, filePath!);
               return;
             }
@@ -239,7 +241,7 @@ class FileDownloader {
           _runningTask.remove(url);
           _tokenMap.remove(url);
           config.onFailed?.call(url, filePath!, "", e.toString(), null);
-          print('下载失败2: $url \n-> $e ->\n$s');
+          printLog('下载失败2: $url \n-> $e ->\n$s');
 
           //HttpException: Connection closed while receiving data
         },
@@ -254,7 +256,13 @@ class FileDownloader {
         msg = error.message;
       }
       config.onFailed?.call(url, filePath, "", msg, e as Exception);
-      print('下载失败1: $url \n-> $msg');
+      printLog('下载失败1: $url \n-> $msg');
+    }
+  }
+
+  void printLog(String s) {
+    if(_openLog){
+      print(s);
     }
   }
 
@@ -282,7 +290,7 @@ void main() async {
     url: url,
     //filePath: "/Users/hss/Downloads/WeAreGoingOnBullrun-2.mp4",
     onSuccess: (url, filePath) {
-      //print('下载成功: $url -> $filePath');
+      //printLog('下载成功: $url -> $filePath');
     },
   ).start();
 
