@@ -158,7 +158,7 @@ class FileDownloader {
           options: Options(responseType: ResponseType.stream,headers: headers),
       cancelToken: cancelToken);
 
-      if (response.statusCode != 200 && response.statusCode != 206) {
+      if (response.statusCode==null || response.statusCode! >= 400) {
         printLog('下载失败: ${response.statusCode}, $url');
         _runningTask.remove(url);
         _tokenMap.remove(url);
