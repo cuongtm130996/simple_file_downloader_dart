@@ -12,9 +12,8 @@ void main() {
 
 
 
- // var url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4";
-  var url = "https://background-business-biz-service-test.oss-cn-hongkong.aliyuncs.com/other/ec79ac786e0a4611afda838510d4fe69116461.pdf"
-      "?Expires=1728716365&OSSAccessKeyId=LTAI4Fg2iUt3nkSrCM2DfiXW&Signature=mKYoz9nLoWufaBpglc68xSI9DgM%3D";
+  var url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4";
+
 
   //response without content-length
   //var url = "http://www.httpwatch.com/httpgallery/chunked/chunkedimage.aspx?0.04400023248109086";
