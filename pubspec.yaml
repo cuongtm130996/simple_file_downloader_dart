@@ -1,6 +1,6 @@
 name: simple_file_downloader_dart
 description: a simple file downloader by dio, support resume  from breakpoint
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/hss01248/simple_file_downloader_dart
 
 environment:
