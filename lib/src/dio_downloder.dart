@@ -120,16 +120,20 @@ class FileDownloader {
       headers.addAll(config.headers);
 
       if (file.existsSync() && file.lengthSync() > 0) {
-        Response headResponse = await _dio!.head(url,options: Options(headers: config.headers));
 
-        if (fileSizeAlreadyKnown == null || fileSizeAlreadyKnown == 0) {
-          fileSizeAlreadyKnown =
-              int.tryParse(headResponse.headers.value('content-length') ?? '0');
+        bool supportRanges = false;
+        try{
+          Response headResponse = await _dio!.head(url,options: Options(headers: config.headers));
+          if (fileSizeAlreadyKnown == null || fileSizeAlreadyKnown == 0) {
+            fileSizeAlreadyKnown =
+                int.tryParse(headResponse.headers.value('content-length') ?? '0');
+          }
+           supportRanges = headResponse.headers.value('accept-ranges') == 'bytes';
+        }catch(e,s){
+          //有的链接不允许head请求: 403
+          printLog("head request failed, $e, $url");
+          file.deleteSync();
         }
-
-        bool supportRanges =
-            headResponse.headers.value('accept-ranges') == 'bytes';
-
 
         if (fileSizeAlreadyKnown != null && fileSizeAlreadyKnown > 0) {
           if (file.lengthSync() == fileSizeAlreadyKnown) {
@@ -143,6 +147,8 @@ class FileDownloader {
           } else {
             file.deleteSync();
           }
+        }else{
+          file.deleteSync();
         }
       }
 
