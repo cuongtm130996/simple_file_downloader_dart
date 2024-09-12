@@ -10,3 +10,6 @@
 ## 1.0.3
 - fix file.delete exception
 
+## 1.0.4
+- fix file.delete time
+
