@@ -131,7 +131,12 @@ class FileDownloader {
            supportRanges = headResponse.headers.value('accept-ranges') == 'bytes';
         }catch(e,s){
           //有的链接不允许head请求: 403
-          printLog("head request failed, $e, $url");
+          String msg = e.toString();
+          if (e is DioError) {
+            DioError error = e;
+            msg = error.message;
+          }
+          printLog("head request failed, $msg, $url");
           //file.deleteSync();
           //path not found: Cannot delete file---> 不要重复删除文件
         }
@@ -149,7 +154,7 @@ class FileDownloader {
             file.deleteSync();
           }
         }else{
-          file.deleteSync();
+          //file.deleteSync();
         }
       }
 
@@ -173,6 +178,19 @@ class FileDownloader {
 
       fileSizeAlreadyKnown = fileSizeAlreadyKnown ??contentLength ;
 
+      if(file.existsSync() && file.lengthSync() > 0){
+        if (fileSizeAlreadyKnown != null && fileSizeAlreadyKnown > 0) {
+          if (file.lengthSync() == fileSizeAlreadyKnown) {
+            printLog('文件已存在并且大小与服务器匹配2 $filePath');
+            _runningTask.remove(url);
+            config.onSuccess(url, filePath);
+            cancelToken.cancel();
+            return;
+          }
+        }else{
+          await file.delete();
+        }
+      }
       var totalBytesReceived = file.existsSync() ? file.lengthSync() : 0;
 
       var sink = isRangeRequest
@@ -226,7 +244,7 @@ class FileDownloader {
               url,
               filePath!,
               'size not same',
-              '文件大小不匹配: ${file.lengthSync()}, $fileSizeAlreadyKnown',
+              ' ${file.lengthSync()}, $fileSizeAlreadyKnown',
               null,
             );
             file.deleteSync();
