@@ -132,7 +132,8 @@ class FileDownloader {
         }catch(e,s){
           //有的链接不允许head请求: 403
           printLog("head request failed, $e, $url");
-          file.deleteSync();
+          //file.deleteSync();
+          //path not found: Cannot delete file---> 不要重复删除文件
         }
 
         if (fileSizeAlreadyKnown != null && fileSizeAlreadyKnown > 0) {

@@ -6,3 +6,7 @@
 
 ## 1.0.2
 -  head request failed will not cause download failed
+
+## 1.0.3
+- fix file.delete exception
+
