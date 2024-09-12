@@ -62,6 +62,7 @@ class FileDownloader {
     required this.url,
     this.filePath,
     this.fileName,
+    this.saveDir,
     this.forceRedownload,
     this.notAcceptRanges,
     this.headers = const {},
