@@ -134,7 +134,7 @@ class FileDownloader {
           String msg = e.toString();
           if (e is DioError) {
             DioError error = e;
-            msg = error.message;
+            msg = error.message ?? '';
           }
           printLog("head request failed, $msg, $url");
           //file.deleteSync();
