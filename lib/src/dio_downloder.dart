@@ -279,7 +279,7 @@ class FileDownloader {
       String msg = e.toString();
       if (e is DioError) {
         DioError error = e;
-        msg = error.message;
+        msg = error.message ?? '';
       }
       config.onFailed?.call(url, filePath, "", msg, e as Exception);
       printLog('下载失败1: $url \n-> $msg');
